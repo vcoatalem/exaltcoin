@@ -63,7 +63,13 @@ class registry:
             }
         ))
 
-    
+
+    def dump(self):
+        print("{:<10} {:<20}".format('User','Address'))
+        for entry in self.cached_registry:
+            print("{:<10} {:<20}".format(entry, self.cached_registry[entry]))
+
+
 Registry = registry()
 Registry.load_cached_registry()
 print(Registry.cached_registry)

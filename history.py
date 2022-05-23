@@ -17,9 +17,18 @@ class history():
     def save_transaction(self, src: str, amount: int):
         with open(self.history_filename, "a") as f:
             writer = csv.writer(f)
-            row = [datetime.now(), amount, src]
+            row = [str(datetime.now()), amount, src]
             writer.writerow(row)
             self.history.append({"date": row[0], "coins": row[1], "from": row[2]})
+
+    def get_current_coin_amount(self):
+        coins = map(lambda history_entry: int(history_entry["coins"]), self.history)
+        return sum(coins)
+
+    def dump(self):
+        print("{:<40} {:<20} {:<10}".format('Date','Amount','User'))
+        for entry in self.history:
+            print("{:<40} {:<20} {:<10}".format(entry["date"], entry["coins"], entry["from"]))
 
 
 History = history()

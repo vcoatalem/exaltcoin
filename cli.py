@@ -1,36 +1,53 @@
 from PyInquirer import prompt
 from identification import username
-
+from history import History
 
 from coins_exchange import send
+from registry import Registry
 
 def show_menu(username: str, coins: int):
     options = {
         "type": "list",
         "name": "main_options",
-        "message": f"Exalt Coin interface. {username} - {coins} Coins on your account",
+        "message": f"Exalt Coin interface. {username} : {coins} Coins on your account",
         "choices": ["Friend List","Send Coins","History"]
     }
     option = prompt(options)
     if (option['main_options']) == "Friend List":
-        show_friendlist()
+        show_registry()
     if (option['main_options']) == "Send Coins":
-        show_sendcoin_menu()
+        show_coinsend_interface()
     if (option['main_options']) == "History":
         show_history()
 
 
-def show_friendlist():
-    
+def show_registry():
+    Registry.dump()
 
-    pass
+def show_coinsend_interface():
+    registry = Registry.cached_registry.keys()
+    options = {
+        "type": "list",
+        "name": "sendcoins",
+        "message": "Choose recipient",
+        "choices": registry
+    }
+    option = prompt(options)
+    dst = option["sendcoins"]
 
-def show_sendcoin_menu():
-    send("test", 10)
+    options = {
+        "type": "input",
+        "name": "sendcoins_amount",
+        "message": "enter amount to be sent"
+    }
+    option = prompt(options)
+    amount = option["sendcoins_amount"]
+
+    send(dst, amount)
     pass
 
 def show_history():
-    pass
+    History.dump()
 
 while True:
-    show_menu(username=username(), coins=10)
+    show_menu(username=username(), coins=History.get_current_coin_amount())

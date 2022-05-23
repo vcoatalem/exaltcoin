@@ -11,7 +11,7 @@ def handle_message(res: str):
     if res_json["action"] == "send coins":
         try:
             src = res_json["from"]
-            coins = res_json["amount"]
+            coins = int(res_json["amount"])
             return lambda : receive(src, coins)
         except:
             return lambda : print("error while parsing send coins message")
