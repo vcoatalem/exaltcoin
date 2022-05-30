@@ -8,4 +8,4 @@ services:
       - "8765:8765"
     volumes:
       - .:/app
-      - ./local_data:/local_data
+      - ./data:/data
