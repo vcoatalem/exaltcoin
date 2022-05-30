@@ -23,14 +23,14 @@ class registry:
     #res = table.query(KeyConditionExpression=(Key('user').eq('mac address')))
 
     def load_cached_registry(self):
-        filename = 'data/registry.csv'
+        filename = 'exaltcoin_data/registry.csv'
         with open(filename, "r") as f:
             reader = csv.reader(f)
             for row in reader:
                 self.cached_registry[row[0]] = row[1]
 
     def save_cached_registry(self):
-        filename = 'data/registry.csv'
+        filename = 'exaltcoin_data/registry.csv'
         with open(filename, "w") as f:
             reader = csv.writer(f)
             for entry in self.cached_registry:

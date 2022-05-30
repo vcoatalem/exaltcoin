@@ -3,7 +3,7 @@ FROM python:3.8
 ADD . /app
 WORKDIR /app
 
-RUN mkdir data
+RUN mkdir -p /exaltcoin_data
 
 RUN pip3 install -r requirements.txt
 

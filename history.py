@@ -6,7 +6,7 @@ class history():
 
     def __init__(self) -> None:
         self.history = []
-        self.history_filename = 'data/history.csv'
+        self.history_filename = '/exaltcoin_data/history.csv'
 
     def load(self):
         with open(self.history_filename, "r") as f:

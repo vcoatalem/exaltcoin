@@ -2,10 +2,9 @@ version: "3.3"
 services:
   server:
     container_name: exaltcoin_server
-    build: .
-    image: xarang/exaltcoin
+    image: xarang/exaltcoin:latest
     ports:
       - "8765:8765"
     volumes:
       - .:/app
-      - ./data:/data
+      - ./exaltcoin_data:/exaltcoin_data
