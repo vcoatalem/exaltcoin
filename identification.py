@@ -6,7 +6,7 @@ import os
 
 def username():
     stream = os.popen("echo $USER")
-    return stream.read()
+    return stream.read().strip()
 
 def get_mac_address():
     return uuid.getnode()

@@ -1,5 +1,5 @@
 import csv
-import os
+from os import path
 from datetime import datetime
 
 class history():
@@ -9,6 +9,8 @@ class history():
         self.history_filename = '/exaltcoin_data/history.csv'
 
     def load(self):
+        if not path.isfile(self.history_filename):
+            open(self.history_filename, 'a').close()
         with open(self.history_filename, "r") as f:
             reader = csv.reader(f)
             for row in reader:

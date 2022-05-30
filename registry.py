@@ -4,6 +4,7 @@ import boto3
 import csv
 import identification
 import os
+from os import path
 
 from boto3.dynamodb.conditions import Key
 
@@ -24,6 +25,8 @@ class registry:
 
     def load_cached_registry(self):
         filename = '/exaltcoin_data/registry.csv'
+        if not path.isfile(filename):
+            open(filename, 'a').close()
         with open(filename, "r") as f:
             reader = csv.reader(f)
             for row in reader:
@@ -31,6 +34,8 @@ class registry:
 
     def save_cached_registry(self):
         filename = '/exaltcoin_data/registry.csv'
+        if not path.isfile(filename):
+            open(filename, 'a').close()
         with open(filename, "w") as f:
             reader = csv.writer(f)
             for entry in self.cached_registry:
@@ -40,22 +45,27 @@ class registry:
         return self.cached_registry[username] if username in self.cached_registry else None
 
     def fetch_address(self, username: str):
-        item = self.table.query(KeyConditionExpression=(Key('user').eq(username)))
-        print("fetched: ", item)
-        if (item):
-            self.cached_registry[item.user] = item.address
-            return item.address
+        query = self.table.query(KeyConditionExpression=(Key('user').eq(username)))
+        print("queried: ", query)
+        if (query):
+            items = query['Items']
+            user = items[0]
+            print("user:", user)
+            self.cached_registry[user["user"]] = user["address"]
+            return user["address"]
         return None
 
     def update_address(self):
-        #mac_address = identification.get_mac_address()
-        username = os.getenv('USERNAME')
+        username = identification.username()
         ip_address = identification.get_public_ip_address()
+        port = 8765
+
+        print(f"will update our address: {username} -> {ip_address}:{port}")
 
         print(self.table.put_item(
             Item={
                 'user': username,
-                'address': ip_address
+                'address': f"{ip_address}:{port}"
             }
         ))
 
