@@ -5,15 +5,12 @@ import csv
 import identification
 import os
 
-from dotenv import load_dotenv
-
 from boto3.dynamodb.conditions import Key
 
 
 class registry:
 
     def __init__(self) -> None:
-        load_dotenv()
         self.dynamodb = boto3.resource(
             'dynamodb',
             aws_access_key_id='AKIAURLO2GZL5SGLVDUE',

@@ -5,13 +5,10 @@ from client import send_message
 from registry import Registry
 from history import History
 
-from dotenv import load_dotenv
 import json
 import os
 
 from identification import username
-
-load_dotenv()
 
 
 def format_send_coins(coins: int, sender: str) -> dict:

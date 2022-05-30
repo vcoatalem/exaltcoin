@@ -1,13 +1,12 @@
 import uuid
 import requests
 
-import dotenv
 import os
 
-dotenv.load_dotenv()
 
 def username():
-    return os.getenv("USERNAME")
+    stream = os.popen("echo $USER")
+    return stream.read()
 
 def get_mac_address():
     return uuid.getnode()
