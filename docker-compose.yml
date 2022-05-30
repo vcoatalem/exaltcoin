@@ -1,0 +1,11 @@
+version: "3.3"
+services:
+  server:
+    container_name: exaltcoin_server
+    build: .
+    image: xarang/exaltcoin
+    ports:
+      - "8765:8765"
+    volumes:
+      - .:/app
+      - ./local_data:/local_data

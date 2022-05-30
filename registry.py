@@ -26,14 +26,14 @@ class registry:
     #res = table.query(KeyConditionExpression=(Key('user').eq('mac address')))
 
     def load_cached_registry(self):
-        filename = os.getenv('DATA_FOLDER') + '/registry.csv'
+        filename = 'data/registry.csv'
         with open(filename, "r") as f:
             reader = csv.reader(f)
             for row in reader:
                 self.cached_registry[row[0]] = row[1]
 
     def save_cached_registry(self):
-        filename = os.getenv('DATA_FOLDER') + '/registry.csv'
+        filename = 'data/registry.csv'
         with open(filename, "w") as f:
             reader = csv.writer(f)
             for entry in self.cached_registry:
@@ -50,7 +50,6 @@ class registry:
             return item.address
         return None
 
-
     def update_address(self):
         #mac_address = identification.get_mac_address()
         username = os.getenv('USERNAME')
@@ -62,7 +61,6 @@ class registry:
                 'address': ip_address
             }
         ))
-
 
     def dump(self):
         print("{:<10} {:<20}".format('User','Address'))

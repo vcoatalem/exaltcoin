@@ -32,7 +32,7 @@ def send(to: str, coins: int):
     print(f"will send {coins} coins to {to} at address {address}")
     payload = format_send_coins(coins=coins, sender=username())
     res = asyncio.run(send_message(address=address, payload=payload))
-    #print(res)
+    print("server returned: ", res)
     History.save_transaction(src=res["from"], amount=res["amount"])
 
 def receive(src: str, amount: int):

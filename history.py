@@ -6,7 +6,7 @@ class history():
 
     def __init__(self) -> None:
         self.history = []
-        self.history_filename = os.getenv('DATA_FOLDER') + '/history.csv'
+        self.history_filename = 'data/history.csv'
 
     def load(self):
         with open(self.history_filename, "r") as f:
@@ -19,7 +19,7 @@ class history():
             writer = csv.writer(f)
             row = [str(datetime.now()), amount, src]
             writer.writerow(row)
-            self.history.append({"date": row[0], "coins": row[1], "from": row[2]})
+            #self.history.append({"date": row[0], "coins": row[1], "from": row[2]})
 
     def get_current_coin_amount(self):
         coins = map(lambda history_entry: int(history_entry["coins"]), self.history)

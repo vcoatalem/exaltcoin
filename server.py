@@ -27,7 +27,7 @@ async def echo(websocket):
         await websocket.send(json.dumps(res))
 
 async def main():
-    async with websockets.serve(echo, "127.0.0.1", 8765):
+    async with websockets.serve(ws_handler=echo, port=8765):
         await asyncio.Future()  # run forever
 
 asyncio.run(main())

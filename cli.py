@@ -23,6 +23,28 @@ def show_menu(username: str, coins: int):
 
 def show_registry():
     Registry.dump()
+    options = {
+        "type": "list",
+        "name": "registry",
+        "message": "Choose action",
+        "choices": [
+            "add entry",
+            "update my address",
+            "return to menu"
+        ]
+    }
+    option = prompt(options)
+    if (option["registry"] == "add entry"):
+        options = {
+            "type": "input",
+            "name": "username",
+            "message": "enter username"
+        }
+        option = prompt(options)
+        username = option["username"]
+        Registry.fetch_address(username=username)
+    elif (option["registry"] == "update my address"):
+        Registry.update_address()
 
 def show_coinsend_interface():
     registry = Registry.cached_registry.keys()
