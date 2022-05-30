@@ -27,11 +27,23 @@ class history():
         coins = map(lambda history_entry: int(history_entry["coins"]), self.history)
         return sum(coins)
 
-    def dump(self):
-        print("{:<40} {:<20} {:<10}".format('Date','Amount','User'))
+    def to_string(self):
+        s = "{:<40} {:<20} {:<10}".format('Date','Amount','User')
         for entry in self.history:
-            print("{:<40} {:<20} {:<10}".format(entry["date"], entry["coins"], entry["from"]))
+            s += "{:<40} {:<20} {:<10}".format(entry["date"], entry["coins"], entry["from"])
+        return s
+        
+    def get(self):
+        return lambda: {
+            "action": "get history",
+            "registry": self.to_string()
+        }
 
+    def get_coins(self):
+        return lambda: {
+            "action": "get coins",
+            "coins": self.get_current_coins_amount()
+        }
 
 History = history()
 History.load()

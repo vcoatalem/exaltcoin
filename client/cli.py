@@ -1,9 +1,16 @@
+from http import server
 from PyInquirer import prompt
-from identification import username
-from history import History
+import json
+import asyncio
 
-from coins_exchange import send
-from registry import Registry
+
+from client import get_history, get_registry, get_user, add_user, refresh_address, get_coins, send_coins
+
+import sys
+
+
+server_address = "127.0.0.1:8765" #sys.argv[1]
+
 
 def show_menu(username: str, coins: int):
     options = {
@@ -22,7 +29,8 @@ def show_menu(username: str, coins: int):
 
 
 def show_registry():
-    Registry.dump()
+    registry = get_registry(server_address)
+    print(registry)
     options = {
         "type": "list",
         "name": "registry",
@@ -42,17 +50,20 @@ def show_registry():
         }
         option = prompt(options)
         username = option["username"]
-        Registry.fetch_address(username=username)
+        add_user(server_address, username)
+        #Registry.fetch_address(username=username)
     elif (option["registry"] == "update my address"):
-        Registry.update_address()
+        refresh_address(server_address)
 
 def show_coinsend_interface():
-    registry = Registry.cached_registry.keys()
+    registry = get_registry()["registry"]
+    registry_json = json.loads(registry)
+    print(registry_json)
     options = {
         "type": "list",
         "name": "sendcoins",
         "message": "Choose recipient",
-        "choices": registry
+        "choices": registry_json.keys()
     }
     option = prompt(options)
     dst = option["sendcoins"]
@@ -64,12 +75,19 @@ def show_coinsend_interface():
     }
     option = prompt(options)
     amount = option["sendcoins_amount"]
-
-    send(dst, amount)
+    send_coins(server_address, dst, amount)
     pass
 
 def show_history():
-    History.dump()
+    history = get_history()["history"]
+    print(history)
+
+
 
 while True:
-    show_menu(username=username(), coins=History.get_current_coin_amount())
+    username = get_user(server_address)
+    print(username)
+    coins = asyncio.run(get_coins(server_address))
+    print(coins)
+    show_menu(username=username["username"], coins=coins["coins"])
+

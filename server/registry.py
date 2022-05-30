@@ -19,12 +19,11 @@ class registry:
             region_name='eu-west-3'
         )
         self.table = self.dynamodb.Table('exaltcoin-registry')
+        self.registry_filename = "/exaltcoin_data/registry.csv"
         self.cached_registry: Dict = {}
 
-    #res = table.query(KeyConditionExpression=(Key('user').eq('mac address')))
-
     def load_cached_registry(self):
-        filename = '/exaltcoin_data/registry.csv'
+        filename = f"{self.registry_filename}"
         if not path.isfile(filename):
             open(filename, 'a').close()
         with open(filename, "r") as f:
@@ -33,9 +32,9 @@ class registry:
                 self.cached_registry[row[0]] = row[1]
 
     def save_cached_registry(self):
-        filename = '/exaltcoin_data/registry.csv'
+        filename = f"{self.registry_filename}"
         if not path.isfile(filename):
-            open(filename, 'a').close()
+            open(filename, "a").close()
         with open(filename, "w") as f:
             reader = csv.writer(f)
             for entry in self.cached_registry:
@@ -46,18 +45,17 @@ class registry:
 
     def fetch_address(self, username: str):
         query = self.table.query(KeyConditionExpression=(Key('user').eq(username)))
-        print("queried: ", query)
-        if (query):
-            items = query['Items']
-            user = items[0]
-            print("user:", user)
-            self.cached_registry[user["user"]] = user["address"]
-            return user["address"]
-        return None
+        items = query['Items']
+        if len(items) == 0:
+            print(f"could not fetch address for user: {username}")
+            return None
+        user = items[0]
+        self.cached_registry[user["user"]] = user["address"]
+        return user["address"]
 
     def update_address(self):
         username = identification.username()
-        ip_address = identification.get_public_ip_address()
+        ip_address = identification.address()
         port = 8765
 
         print(f"will update our address: {username} -> {ip_address}:{port}")
@@ -69,10 +67,17 @@ class registry:
             }
         ))
 
-    def dump(self):
-        print("{:<10} {:<20}".format('User','Address'))
+    def to_string(self):
+        s = "{:<10} {:<20}".format('User','Address')
         for entry in self.cached_registry:
-            print("{:<10} {:<20}".format(entry, self.cached_registry[entry]))
+            s += "{:<10} {:<20}".format(entry, self.cached_registry[entry])
+        return s
+
+    def get(self):
+        return {
+            "action": "get registry",
+            "registry": self.to_string()
+        }
 
 
 Registry = registry()
