@@ -19,7 +19,7 @@ def format_send_coins(coins: int, sender: str) -> dict:
         "from": sender
     }
 
-def send_coins(to: str, coins: str):
+def send_coins(to: str, coins: int):
     registry = get_registry()
     
     address = registry[to] if to in registry else None
@@ -33,6 +33,6 @@ def send_coins(to: str, coins: str):
     payload = format_send_coins(coins=coins, sender=username())
     res = asyncio.run(send_message(address=address, payload=payload))
     print("server returned: ", res)
-    save_transaction(src=to, amount=-int(coins))
+    save_transaction(src=to, amount=-coins)
 
 

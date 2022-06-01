@@ -23,7 +23,7 @@ def save_transaction(src: str, amount: int):
 def get_current_coin_amount(history : dict):
     history = get_history()
     coins = map(lambda history_entry: int(history_entry["coins"]), history)
-    return sum(coins)
+    return sum(coins) + 10 #initial capital
 
 def print_history(history: dict):
         print("{:<40} {:<20} {:<10}".format('Date','Amount','User'))

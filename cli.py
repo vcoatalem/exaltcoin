@@ -23,7 +23,7 @@ def show_menu(username: str, coins: int):
     if (option['main_options']) == "Friend List":
         show_registry()
     if (option['main_options']) == "Send Coins":
-        show_coinsend_interface()
+        show_coinsend_interface(coins)
     if (option['main_options']) == "History":
         show_history()
 
@@ -56,7 +56,7 @@ def show_registry():
     elif (option["registry"] == "update my address"):
         Client.update_address()
 
-def show_coinsend_interface():
+def show_coinsend_interface(coins: int):
     registry = get_registry()
     recipients = registry.keys()
     options = {
@@ -74,10 +74,13 @@ def show_coinsend_interface():
         "message": "enter amount to be sent"
     }
     option = prompt(options)
-    amount = option["sendcoins_amount"]
-
+    amount = int(option["sendcoins_amount"])
+    if amount < 0:
+        print("Cant send negative money!")
+    if amount > coins:
+        print("You do not have that many coins!")
+        return
     send_coins(dst, amount)
-    pass
 
 def show_history():
     history = get_history()
