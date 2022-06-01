@@ -1,13 +1,14 @@
 import asyncio
 from audioop import add
+from http import client
 
 from client import send_message
-from registry import Registry
-from history import History
+from fs.registry import get_registry, save_registry_entry
+from fs.history import save_transaction
 
 import json
 import os
-
+from client import Client
 from identification import username
 
 
@@ -18,11 +19,13 @@ def format_send_coins(coins: int, sender: str) -> dict:
         "from": sender
     }
 
-def send(to: str, coins: int):
-    address = Registry.get_address(to)
+def send_coins(to: str, coins: str):
+    registry = get_registry()
+    
+    address = registry[to] if to in registry else None
     if (address == None):
         print("Could not get address for user: " + to + ". Will try to fetch it from registry")
-        address = Registry.fetch_address(to)
+        address = Client.fetch_address(to)
         if (address == None):
             print("Could not fetch address for user: " + to + " from registry.")
             return None
@@ -30,12 +33,6 @@ def send(to: str, coins: int):
     payload = format_send_coins(coins=coins, sender=username())
     res = asyncio.run(send_message(address=address, payload=payload))
     print("server returned: ", res)
-    History.save_transaction(src=res["from"], amount=res["amount"])
+    save_transaction(src=to, amount=-int(coins))
 
-def receive(src: str, amount: int):
-    History.save_transaction(src=src, amount=amount)
-    return {
-        "action": "save transaction",
-        "from": os.getenv('USERNAME'),
-        "amount": -amount
-    }
+

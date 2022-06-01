@@ -1,9 +1,16 @@
 from PyInquirer import prompt
 from identification import username
-from history import History
 
-from coins_exchange import send
-from registry import Registry
+
+from coins_exchange import send_coins
+
+from fs.history import get_current_coin_amount, get_history, print_history
+from fs.registry import get_registry, print_registry, save_registry_entry
+
+import client
+
+from client import Client
+
 
 def show_menu(username: str, coins: int):
     options = {
@@ -22,7 +29,8 @@ def show_menu(username: str, coins: int):
 
 
 def show_registry():
-    Registry.dump()
+    registry = get_registry()
+    print_registry(registry)
     options = {
         "type": "list",
         "name": "registry",
@@ -42,17 +50,20 @@ def show_registry():
         }
         option = prompt(options)
         username = option["username"]
-        Registry.fetch_address(username=username)
+        address = Client.fetch_address(username=username)
+        save_registry_entry(username, address)
+        
     elif (option["registry"] == "update my address"):
-        Registry.update_address()
+        Client.update_address()
 
 def show_coinsend_interface():
-    registry = Registry.cached_registry.keys()
+    registry = get_registry()
+    recipients = registry.keys()
     options = {
         "type": "list",
         "name": "sendcoins",
         "message": "Choose recipient",
-        "choices": registry
+        "choices": recipients
     }
     option = prompt(options)
     dst = option["sendcoins"]
@@ -65,11 +76,13 @@ def show_coinsend_interface():
     option = prompt(options)
     amount = option["sendcoins_amount"]
 
-    send(dst, amount)
+    send_coins(dst, amount)
     pass
 
 def show_history():
-    History.dump()
+    history = get_history()
+    print_history(history)
 
 while True:
-    show_menu(username=username(), coins=History.get_current_coin_amount())
+    history = get_history()
+    show_menu(username=username(), coins=get_current_coin_amount(history=history))

@@ -2,7 +2,10 @@ import asyncio
 import json
 import websockets
 
-from coins_exchange import receive
+from fs.history import save_transaction
+
+import os
+
 
 def handle_message(res: str):
     res_json = json.loads(res)
@@ -10,14 +13,14 @@ def handle_message(res: str):
         return lambda : print("could not find action in message")
     if res_json["action"] == "send coins":
         try:
-            src = res_json["from"]
+            sender = res_json["from"]
             coins = int(res_json["amount"])
-            return lambda : receive(src, coins)
+            return lambda : receive_coins(sender, coins)
         except:
             return lambda : print("error while parsing send coins message")
 
 
-async def echo(websocket):
+async def handle_socket(websocket):
     async for message in websocket:
         print(message)
         f = handle_message(message)
@@ -26,8 +29,17 @@ async def echo(websocket):
             res = json.dumps({"error": "Error while processing message"})
         await websocket.send(json.dumps(res))
 
-async def main():
-    async with websockets.serve(ws_handler=echo, port=8765):
+
+def receive_coins(sender: str, amount: int):
+    save_transaction(src=sender, amount=amount)
+    return {
+        "action": "save transaction",
+        "from": sender,
+        "amount": amount
+    }
+
+async def serve():
+    async with websockets.serve(ws_handler=handle_socket, port=8765):
         await asyncio.Future()  # run forever
 
-asyncio.run(main())
+asyncio.run(serve())
