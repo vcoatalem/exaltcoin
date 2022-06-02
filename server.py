@@ -1,10 +1,12 @@
 import asyncio
+import boto3
 import json
 import websockets
-
+import identification
 from fs.history import save_transaction
 
 import os
+from dotenv import load_dotenv
 
 
 def handle_message(res: str):
@@ -38,7 +40,25 @@ def receive_coins(sender: str, amount: int):
         "amount": amount
     }
 
+def update_address(username: str, ip_address: str, port: int):
+    load_dotenv()
+    print(f"will update our address: {username} -> {ip_address}:{port} in dynamodb")
+    dynamodb = boto3.resource(
+            'dynamodb',
+            aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+            aws_secret_access_key=os.getenv("AWS_ACCESS_SECRET_KEY"),
+            region_name='eu-west-3'
+        )
+    table = dynamodb.Table('exaltcoin-registry')
+    table.put_item(
+        Item={
+            'user': username,
+            'address': f"{ip_address}:{port}"
+        }
+    )
+
 async def serve():
+    update_address(identification.username(), identification.get_public_ip_address(), 8765)
     async with websockets.serve(ws_handler=handle_socket, port=8765):
         await asyncio.Future()  # run forever
 

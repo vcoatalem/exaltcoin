@@ -1,13 +1,11 @@
 from PyInquirer import prompt
 from identification import username
-
-
+import os
+import sys
 from coins_exchange import send_coins
 
 from fs.history import get_current_coin_amount, get_history, print_history
 from fs.registry import get_registry, print_registry, save_registry_entry
-
-import client
 
 from client import Client
 
@@ -17,15 +15,17 @@ def show_menu(username: str, coins: int):
         "type": "list",
         "name": "main_options",
         "message": f"Exalt Coin interface. {username} : {coins} Coins on your account",
-        "choices": ["Friend List","Send Coins","History"]
+        "choices": ["Friend List","Send Coins","History", "Exit CLI"]
     }
     option = prompt(options)
-    if (option['main_options']) == "Friend List":
+    if option['main_options'] == "Friend List":
         show_registry()
-    if (option['main_options']) == "Send Coins":
+    if option['main_options'] == "Send Coins":
         show_coinsend_interface(coins)
-    if (option['main_options']) == "History":
+    if option['main_options'] == "History":
         show_history()
+    if option['main_options'] == "Exit CLI":
+        sys.exit()
 
 
 def show_registry():
@@ -51,7 +51,8 @@ def show_registry():
         option = prompt(options)
         username = option["username"]
         address = Client.fetch_address(username=username)
-        save_registry_entry(username, address)
+        if address:
+            save_registry_entry(username, address)
         
     elif (option["registry"] == "update my address"):
         Client.update_address()
@@ -59,6 +60,9 @@ def show_registry():
 def show_coinsend_interface(coins: int):
     registry = get_registry()
     recipients = registry.keys()
+    if len(recipients) == 0:
+        print("You have no friends ! :(")
+        return
     options = {
         "type": "list",
         "name": "sendcoins",
@@ -77,6 +81,7 @@ def show_coinsend_interface(coins: int):
     amount = int(option["sendcoins_amount"])
     if amount < 0:
         print("Cant send negative money!")
+        return
     if amount > coins:
         print("You do not have that many coins!")
         return

@@ -32,7 +32,12 @@ def send_coins(to: str, coins: int):
     print(f"will send {coins} coins to {to} at address {address}")
     payload = format_send_coins(coins=coins, sender=username())
     res = asyncio.run(send_message(address=address, payload=payload))
-    print("server returned: ", res)
+    if res == None:
+        print(f"could not reach address {address}. Will try to fetch address from registry.")
+        address = Client.fetch_address(to)
+        res = asyncio.run(send_message(address=address, payload=payload))
+        if res == None:
+            print(f"could not send coins to {to}")
+            return
     save_transaction(src=to, amount=-coins)
-
-
+        

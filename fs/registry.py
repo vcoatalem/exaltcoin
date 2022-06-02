@@ -12,18 +12,14 @@ from boto3.dynamodb.conditions import Key
 registry_filename = '/exaltcoin_data/registry.csv'
 def get_registry():
     registry = {}
-    if not path.isfile(registry_filename):
-        open(registry_filename, 'a').close()
-    with open(registry_filename, "r") as f:
+    with open(registry_filename, 'r') as f:
         reader = csv.reader(f)
         for row in reader:
             registry[row[0]] = row[1]
     return registry
 
 def save_registry_entry(username: str, address: str):
-    if not path.isfile(registry_filename):
-        open(registry_filename, 'a').close()
-    with open(registry_filename, "w") as f:
+    with open(registry_filename, 'a') as f:
         reader = csv.writer(f)
         reader.writerow([username, address])
 
